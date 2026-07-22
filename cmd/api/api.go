@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/I-Maged/ecom/service/user"
 	"github.com/gorilla/mux"
 )
 
@@ -22,9 +23,12 @@ func NewAPIServer(addr string, db *sql.DB) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := mux.NewRouter()
-	// subRouter := router.PathPrefix("/api/v1").Subrouter()
+	subRouter := router.PathPrefix("/api/v1").Subrouter()
 
-	log.Println("Listening on server:", s.addr)
+	userHandler := user.NewHandler()
+	userHandler.RegisterRoutes(subRouter)
+
+	log.Println("Listening on server", s.addr)
 
 	return http.ListenAndServe(s.addr, router)
 }
