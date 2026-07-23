@@ -7,6 +7,7 @@ import (
 	"github.com/I-Maged/ecom/service/auth"
 	"github.com/I-Maged/ecom/types"
 	"github.com/I-Maged/ecom/utils"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -31,6 +32,13 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	var user types.RegisterUserPayload
 	if err := utils.ParseJSON(r, &user); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// validate
+	if err := utils.Validate.Struct(user); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid payload %v\n", errors))
 		return
 	}
 
